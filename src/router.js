@@ -14,6 +14,7 @@ const routes = [
   {
     path: "/profile",
     component: Profile,
+    props: {'fromRouter': true},
     children: [
       {
         path: "new",

@@ -7,7 +7,7 @@
 <p>Для принятия участия, пожалуйста, заполните регистрационную форму.
   На указанный вами Email будет выслано подтверждение. При регистрации Вы можете создать свой аккаунт(профиль).
 </p>
-<Profile v-if="!Profile && regForm" @on-cancel="regForm = false" />
+<Profile v-if="!Profile && regForm" @cancel="regForm = false" />
 <a v-show="!Profile && !regForm" class="btn-large" @click="regForm = true"><i class="material-icons left">add</i><span>Регистрация</span></a>
 
 <h2>Комментарии программиста</h2>

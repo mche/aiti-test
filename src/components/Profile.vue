@@ -43,15 +43,19 @@
         </div>
 
         <div class="input-field col s12 m6">
-          <input id="payment" v-model="form.payment" type="text" class="validate"
+          <input id="payment" ref="inputPayment" v-model="form.payment" type="text" class="validate"
             @keyup="changeMoney($event)" @keypress="changeMoney()" @blur="changeMoney()" >
           <label for="payment" class="active">Сумма взноса, руб</label>
           <span class="helper-text" data-error="" data-success="">Сумма может составлять от 100 до 10 000 руб.</span>
+          <span class="right payment-set"> 
+                <a @click="form.payment = 500; $refs.inputPayment.focus();" href="javascript:" class="chip hoverable">500 руб</a>
+                <a @click="form.payment = 1000; $refs.inputPayment.focus();" href="javascript:" class="chip hoverable">1000 руб</a>
+          </span>
         </div>
       </div>
 
       <div class="row">
-        <div class="col s12" :class="{'card card-content m6 offset-m3': !!form.confirm, 'm6': !!form.id}">
+        <div class="col s12" :class="{'card card-content m6 offset-m3': !!form.confirm || !!form.id}">
           <div v-show="!form.id" class="center">
             <span class="">Создать профиль </span>
             <label class="chip grey lighten-4">
@@ -64,7 +68,7 @@
             <h6 v-show="!form.id">Ваш логин: <span class="chip">{{ form.email }}</span> </h6>
             <div class="input-field passwd">
               <input id="password" :type="visibilityPasswd ? 'text' : 'password'" v-model="form.passwd" class=""
-                :class="form.passwd.length ? IsValidPasswd ? 'valid' : 'invalid' : ''" >
+                :class="form.passwd.length ? IsValidPasswd ? 'valid' : 'invalid' : ''" autocomplete="off">
               <label for="password" :class="{'active': form.passwd.length}">Укажите пароль для вашего профиля</label>
               <span class="helper-text" data-error="любые символы от 3 до 10 знаков включительно" data-success=""></span>
               <a @click="visibilityPasswd = !visibilityPasswd" href="javascript:" class="hoverable">
@@ -129,6 +133,12 @@ const props = {
       return { birth: "2000-03-15", distance:0, phone:'', rawPhone:'', name:'', email:'', passwd:'', payment:300, confirm: false,};
     },
   },
+  fromRouter: {
+      type: Boolean,
+      default: () => {
+          return false;
+      },
+  }
 };
 
 function data(){
@@ -164,19 +174,26 @@ const methods = {
     this.form.rawPhone = event.target.dataset.maskRawValue;
   },
   changeMoney(event){
-    if (event && re.nonDigit.test(this.form.payment.toString())) {
-      event.preventDefault();
-      this.form.payment = this.form.payment.toString().replace(re.nonDigit, '');
-      return false;
-    }
-    this.form.payment = this.form.payment.toString().replace(re.nonDigit, '');
-    let sum = Math.max(Math.min(this.form.payment, 10000), 100);
-    if (!isNaN(sum)) this.form.payment = sum;
+    if (this.changeMoneyTimer) clearTimeout(this.changeMoneyTimer);
+    this.changeMoneyTimer = setTimeout(() => {
+        let input = this.form.payment.toString();
+        if ( input === '') return true;
+        let payment = input.replace(re.nonDigit, '');
+        if (event && input !== payment) {
+            event.preventDefault();
+            this.form.payment = payment;
+            return false;
+        }
+        this.form.payment = payment;
+        let sum = Math.max(Math.min(this.form.payment, 10000), 100);
+        if (!isNaN(sum)) this.form.payment = sum;
+    }, 500);
   },
   Save(){
     this.isProgress = true;
     this.form.createDate = this.form.createDate || new Date();
     this.form.phone = '+7'+this.form.rawPhone;
+    if (!this.form.confirm && !this.form.id) this.form.passwd = ''; 
     let toast = !this.form.id;
     this.$store.dispatch('Register', this.form).then((success) => {
       if (toast) M.toast({html: 'Поздравляем! Ваша заявка сохранена.'});
@@ -190,7 +207,8 @@ const methods = {
     });
   },
   Cancel(){
-    if (this.hasOnCancel) this.$emit('on-cancel');
+    if (!this.fromRouter) 
+        this.$emit('cancel');
     else this.$router.back();
     //if (this.$router.currentRoute.path !== '/participants') this.$router.push('/participants');
   },
@@ -218,21 +236,25 @@ const computed = {
   IsValidDistance(){
     return !!this.form.distance;
   },
+  IsValidPayment(){
+      return this.form.payment.toString() !== '';
+  },
   IsValidForm(){
     this.saveError = undefined;
     return this.IsValidName
       && this.IsValidPhone
       && this.IsValidEmail
       && (!this.form.confirm || this.IsValidPasswd)
-      && this.IsValidDistance;
+      && this.IsValidDistance
+      && this.IsValidPayment;
   },
-  hasOnCancel(){
-    return this.$attrs  && Boolean(this.$attrs['onOn-cancel']);
-  }
+  /*hasOnCancel(){
+    return this.$attrs  && Boolean(this.$attrs['onCancel']);
+  }*/
 };
 
 const components = {Preloader};
-const emits = ['onRegister', 'onCancel'];
+const emits = ['onRegister', 'cancel'];
 
 export default {
   emits,
@@ -253,6 +275,20 @@ export default {
   top: 0.5rem;
   right: 0;
   color: $primary-color;
+}
+
+.payment-set {
+    font-size: smaller;
+    position: absolute;
+    right: 0;
+    top: 1rem;
+    .chip {
+        padding: 0 0.5rem;
+        line-height: normal;
+        vertical-align: middle;
+        height: auto;
+
+    }
 }
 
 </style>

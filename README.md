@@ -18,5 +18,11 @@ npm run build
 npm run serve
 ```
 
+### Размещение
+```
+surge dist aiti.surge.sh
+```
+
+
 
 
