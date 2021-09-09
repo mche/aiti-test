@@ -1,0 +1,14 @@
+@import "materialize-css/sass/components/_color-variables.scss";
+@import "materialize-css/sass/components/_variables.scss";
+// переменные материализ
+$primary-color: rgb(71, 71, 142);
+$h1-fontsize: 3rem;
+$h2-fontsize: 2rem;
+$h3-fontsize: 1.5rem;
+$h3-fontsize: 1rem;
+h1, h2, h3, h4, h5, h6 {
+  color: $primary-color;
+}
+$input-focus-color: $primary-color;
+$button-raised-background: $primary-color;
+$button-raised-background-hover: lighten($primary-color, 10%);
