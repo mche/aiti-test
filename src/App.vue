@@ -22,7 +22,7 @@
         </ul>
       </div>
     </nav>
-    <div v-show="ready" class="container">
+    <div v000-show="ready" class="container">
       <router-view></router-view>
       
     </div>
@@ -30,12 +30,12 @@
 </template>
 <!-- ------------------------ конец шаблона --------- ------------------->
 <script>
-import loadData from "./data.js";
+///import loadData from "./data.js";
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 
 export default {
-  data(){
+/*  data(){
     let vm = this;
     loadData.then(function (data) {
       vm.$store.commit('participants', data.users);
@@ -43,6 +43,7 @@ export default {
     });
     return {ready: false};
   },
+*/
   setup() {
     const currentRoute = computed(() => {
       return useRoute();

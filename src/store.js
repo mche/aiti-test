@@ -78,4 +78,12 @@ const store = createStore({
   },
 });
 
+fetch('data.json')
+    .then((response) => response.json())
+    .then(data => {
+        store.commit('participants', data.users)  
+      })
+    .catch(err => console.log('fetch data.json error:', err))
+  
+
 export default store;
